@@ -6,9 +6,27 @@ use frontend\models\Articles;
 use frontend\models\SignupForm;
 use Yii;
 use yii\base\Model;
+use yii\filters\AccessControl;
 
 class CmsController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['insert'],
+                'rules' => [
+                    [
+                        'actions' => ['insert'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
         $tenDays=time()-864000;
@@ -82,6 +100,18 @@ class CmsController extends \yii\web\Controller
            return $this->goBack();
         }
 
+    }
+
+    public function actionInsert(){
+        $model=new Articles();
+        $model->author_id=13;
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+//        $model->author_id=Yii::$app->user->id;
+
+        return $this->render('insert' , ['model' => $model] );
     }
 
 }

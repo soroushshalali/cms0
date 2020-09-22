@@ -13,6 +13,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $text
  * @property string $short_text
  * @property string $author
+ * @property int $author_id
  * @property int $created_at
  * @property int $updated_at
  */
@@ -34,14 +35,8 @@ class Articles extends \yii\db\ActiveRecord
         return [
             [['title', 'text', 'short_text', 'author'], 'required'],
             [['text', 'short_text'], 'string'],
+            [['author_id'], 'integer'],
             [['title', 'author'], 'string', 'max' => 256],
-        ];
-    }
-
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
         ];
     }
 
@@ -56,8 +51,16 @@ class Articles extends \yii\db\ActiveRecord
             'text' => 'Text',
             'short_text' => 'Short Text',
             'author' => 'Author',
+            'author_id' => 'Author ID',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+        ];
+    }
+
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className(),
         ];
     }
 }
