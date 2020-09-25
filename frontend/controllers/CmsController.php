@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\component\AuthorRule;
 use common\models\LoginForm;
 use common\models\User;
 use frontend\models\Articles;
@@ -21,7 +22,7 @@ class CmsController extends \yii\web\Controller
                     [
                         'actions' => ['insert' , 'delete' , 'update'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['user'],
                     ],
                 ],
             ],
@@ -141,6 +142,51 @@ class CmsController extends \yii\web\Controller
     public function actionProfile(){
         $user = User::findOne(Yii::$app->user->id);
         return $this->render('profile' , ['user' => $user]);
+    }
+
+    public function actionInit(){
+        $auth=Yii::$app->authManager;
+
+        $insert=$auth->createPermission('insert');
+        $auth->add($insert);
+
+        $delete=$auth->createPermission('delete');
+        $auth->add($delete);
+
+        $update=$auth->createPermission('update');
+        $auth->add($update);
+
+        $admin=$auth->createRole('admin');
+        $auth->add($admin);
+
+        $user=$auth->createRole('user');
+        $auth->add($user);
+
+        $auth->addChild($admin , $delete);
+        $auth->addChild($admin , $update);
+        $auth->addChild($admin , $insert);
+
+        $auth->addChild($user , $delete);
+        $auth->addChild($user , $update);
+        $auth->addChild($user , $insert);
+
+
+        $auth->assign($admin , 1);
+
+
+        //Rule
+        $rule=new AuthorRule();
+        $auth->add($rule);
+
+        $deleteOwnPost=$auth->createPermission('deleteOwnPost');
+        $deleteOwnPost->ruleName= $rule->name;
+        $auth->add($deleteOwnPost);
+        $auth->addChild($deleteOwnPost , $delete);
+        $auth->addChild($user,$deleteOwnPost);
+
+
+
+
     }
 
 }

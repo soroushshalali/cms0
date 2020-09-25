@@ -3,7 +3,6 @@
 namespace frontend\models;
 
 use Yii;
-use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "articles".
@@ -16,6 +15,8 @@ use yii\behaviors\TimestampBehavior;
  * @property int $author_id
  * @property int $created_at
  * @property int $updated_at
+ *
+ * @property User $author0
  */
 class Articles extends \yii\db\ActiveRecord
 {
@@ -33,10 +34,11 @@ class Articles extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'text', 'short_text', 'author'], 'required'],
+            [['title', 'text', 'short_text', 'author', 'author_id', 'created_at', 'updated_at'], 'required'],
             [['text', 'short_text'], 'string'],
-            [['author_id'], 'integer'],
+            [['author_id', 'created_at', 'updated_at'], 'integer'],
             [['title', 'author'], 'string', 'max' => 256],
+            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['author_id' => 'id']],
         ];
     }
 
@@ -57,10 +59,13 @@ class Articles extends \yii\db\ActiveRecord
         ];
     }
 
-    public function behaviors()
+    /**
+     * Gets query for [[Author0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthor0()
     {
-        return [
-            TimestampBehavior::className(),
-        ];
+        return $this->hasOne(User::className(), ['id' => 'author_id']);
     }
 }
