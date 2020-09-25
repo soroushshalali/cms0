@@ -1,7 +1,8 @@
 <?php
-
 namespace frontend\controllers;
+
 use common\models\LoginForm;
+use common\models\User;
 use frontend\models\Articles;
 use frontend\models\SignupForm;
 use Yii;
@@ -15,10 +16,10 @@ class CmsController extends \yii\web\Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['insert'],
+                'only' => ['insert' , 'delete' , 'update'],
                 'rules' => [
                     [
-                        'actions' => ['insert'],
+                        'actions' => ['insert' , 'delete' , 'update'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -103,15 +104,43 @@ class CmsController extends \yii\web\Controller
     }
 
     public function actionInsert(){
+        $user = User::findOne(Yii::$app->user->id);
         $model=new Articles();
-        $model->author_id=13;
+        $model->author_id=Yii::$app->user->id;
+        $model->author=$user->username;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         }
 
-//        $model->author_id=Yii::$app->user->id;
-
         return $this->render('insert' , ['model' => $model] );
+    }
+
+    public function actionDelete($id=null){
+        if (isset($id)){
+            $article= Articles::find($id)->one();
+             if ($article !== null){
+                $article->delete();
+                $this->goBack();
+             }
+        }
+    }
+
+    public function actionUpdate($id=null){
+        if (isset($id)){
+            $model= Articles::find($id)->one();
+        }else{
+            echo 'id:(';
+        }
+       
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+        return $this->render('update' , ['model' => $model] );
+    }
+
+    public function actionProfile(){
+        $user = User::findOne(Yii::$app->user->id);
+        return $this->render('profile' , ['user' => $user]);
     }
 
 }

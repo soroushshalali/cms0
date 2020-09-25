@@ -9,11 +9,10 @@ use yii\bootstrap\ActiveForm;
 
 <?= $insertForm->field($model, 'title')->textInput(['autofocus' => true]) ?>
 
-<?= $insertForm->field($model, 'text') ?>
+<?= $insertForm->field($model, 'text')->textarea(['rows' => '6']) ?>
 
 <?= $insertForm->field($model, 'short_text') ?>
 
-<?= $insertForm->field($model, 'author') ?>
 
 <div class="form-group">
     <?= Html::submitButton('Insert', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>

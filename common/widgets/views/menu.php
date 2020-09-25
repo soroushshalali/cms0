@@ -7,7 +7,7 @@
         background-color: #f2f2ff;
         box-shadow: 0 0 4px #d2d2ff;
     }
-    .main_menu > ul{
+    .main_menu > ul:nth-of-type(1){
         display: flex;
         list-style-type: none;
         justify-content: space-between;
@@ -15,7 +15,7 @@
         width: 500px;
         font-size: 20px;
     }
-    .main_menu > ul > li{
+    .main_menu > ul:nth-of-type(1) > li{
         width: 100%;
         height: 100%;
         display: flex;
@@ -24,14 +24,14 @@
         transition: 0.4s;
         border-radius: 4px;
     }
-    .main_menu > ul > li:hover{
+    .main_menu > ul:nth-of-type(1) > li:hover{
         background-color: #adb4f5;
         box-shadow: 0 0 5px #c6c6c6;
         color: white;
         margin: 8px;
         cursor: pointer;
     }
-    .main_menu > ul > li > a{
+    .main_menu > ul:nth-of-type(1) > li > a{
         text-decoration: none;
         color: #4a4a4a;
     }
@@ -40,6 +40,19 @@
         text-shadow: 0 0 5px #c6c6c6 ;
         font-size: 40px;
         font-weight: 500;
+    }
+
+
+    .usermenu{  
+        padding: 0 30px;
+        display: flex;
+        list-style-type: none;
+        justify-content: space-between;
+    }
+
+    .usermenu > li{
+        margin-top: -60px;
+        font-size: 30px;
     }
 </style>
 
@@ -58,3 +71,9 @@
         <li><a href="http://localhost/frontend/web/index.php?r=cms%2F<?php echo ($isGuest) ? 'login' : 'logout' ; ?>" ><?php echo ($isGuest) ? 'Login' : 'Logout' ; ?></a></li>
     </ul>
 </nav>
+<?php if (!$isGuest){ ?>
+    <ul class="usermenu" >
+        <li><a href="http://localhost/frontend/web/index.php?r=cms%2Finsert"><i class="fas fa-plus"  ></i></a></li>
+        <li><a href="http://localhost/frontend/web/index.php?r=cms%2Fprofile"><i class="fas fa-user-circle"  ></i></a></li>
+    </ul>
+    <?php } ?>
