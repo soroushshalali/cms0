@@ -1,7 +1,7 @@
 <?php
 namespace frontend\controllers;
 
-use common\component\AuthorRule;
+use frontend\component\AuthorRule;
 use common\models\LoginForm;
 use common\models\User;
 use frontend\models\Articles;
@@ -9,25 +9,57 @@ use frontend\models\SignupForm;
 use Yii;
 use yii\base\Model;
 use yii\filters\AccessControl;
+use frontend\components\AuthHandler;
+
 
 class CmsController extends \yii\web\Controller
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['insert' , 'delete' , 'update'],
-                'rules' => [
-                    [
-                        'actions' => ['insert' , 'delete' , 'update'],
-                        'allow' => true,
-                        'roles' => ['user'],
-                    ],
-                ],
+     public function behaviors()
+     {
+         return [
+             'access' => [
+                 'class' => AccessControl::className(),
+                 'only' => ['insert' , 'delete' , 'update'],
+                 'rules' => [
+                     [
+                         'actions' => ['insert', 'delete' , 'update'],
+                         'allow' => true,
+                         'roles' => ['user'],
+                     ],
+                     [
+                         'actions' => ['insert' , 'delete' , 'update'],
+                         'allow' => true,
+                         'roles' => ['admin'],
+                     ],
+                 ],
+             ],
+         ];
+     }
+
+     
+     public function actions()
+     {
+         return [
+             'error' => [
+                 'class' => 'yii\web\ErrorAction',
+             ],
+             'captcha' => [
+                 'class' => 'yii\captcha\CaptchaAction',
+                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+             ],
+             'auth' => [
+                'class' => 'yii\authclient\AuthAction',
+                'successCallback' => [$this, 'onAuthSuccess'],
             ],
-        ];
-    }
+         ];
+     }
+
+ 
+     public function onAuthSuccess($client)
+     {
+         (new AuthHandler($client))->handle();
+     }
+
 
     public function actionIndex()
     {
@@ -70,7 +102,7 @@ class CmsController extends \yii\web\Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+            return $this->redirect(['index']);
         } else {
 
             $model->password = '';
@@ -84,7 +116,7 @@ class CmsController extends \yii\web\Controller
     public function actionLogout(){
         Yii::$app->user->logout();
 
-        return $this->goHome();
+        return $this->redirect(['index']);
     }
 
     public function actionAbout(){
@@ -105,10 +137,10 @@ class CmsController extends \yii\web\Controller
     }
 
     public function actionInsert(){
-        $user = User::findOne(Yii::$app->user->id);
+        // $user = User::findOne(Yii::$app->user->id);
         $model=new Articles();
         $model->author_id=Yii::$app->user->id;
-        $model->author=$user->username;
+        // $model->author=$user->username;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         }
@@ -117,11 +149,12 @@ class CmsController extends \yii\web\Controller
     }
 
     public function actionDelete($id=null){
-        if (isset($id)){
-            $article= Articles::find($id)->one();
-             if ($article !== null){
-                $article->delete();
-                $this->goBack();
+        if ($id !== null){
+            $model=Articles::findOne($id);
+             if ($model !== null){
+                if($model->delete()){
+                    $this->redirect(['index']);
+                }
              }
         }
     }
@@ -172,21 +205,24 @@ class CmsController extends \yii\web\Controller
 
 
         $auth->assign($admin , 1);
+        $auth->assign($user , 2);
 
 
         //Rule
-        $rule=new AuthorRule();
+        $rule=new \frontend\component\AuthorRule();
         $auth->add($rule);
 
         $deleteOwnPost=$auth->createPermission('deleteOwnPost');
+        $deleteOwnPost->description = 'Update own post';
         $deleteOwnPost->ruleName= $rule->name;
         $auth->add($deleteOwnPost);
+
         $auth->addChild($deleteOwnPost , $delete);
+        
         $auth->addChild($user,$deleteOwnPost);
 
-
-
-
     }
+
+
 
 }

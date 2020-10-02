@@ -3,7 +3,7 @@
 namespace frontend\models;
 
 use Yii;
-
+use common\models\User;
 /**
  * This is the model class for table "articles".
  *
@@ -34,11 +34,11 @@ class Articles extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'text', 'short_text', 'author', 'author_id', 'created_at', 'updated_at'], 'required'],
+            [['title', 'text', 'short_text', 'author_id', 'created_at', 'updated_at'], 'required'],
             [['text', 'short_text'], 'string'],
             [['author_id', 'created_at', 'updated_at'], 'integer'],
             [['title', 'author'], 'string', 'max' => 256],
-            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['author_id' => 'id']],
+             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['author_id' => 'id']],
         ];
     }
 

@@ -32,8 +32,8 @@
            <h4><?= date('y,m,d' , $model->created_at) ?></h4>
        </div>
     </article>
-    <a href="http://localhost/frontend/web/index.php?r=cms%2Fdelete&id=<?php $model->id   ?>" >Delete</a>
-    <a href="http://localhost/frontend/web/index.php?r=cms%2Fupdate&id=<?php $model->id   ?>" >update</a>
+    <a href="http://localhost/frontend/web/index.php?r=cms%2Fdelete&id=<?= $model->id ?>" >Delete</a>
+    <a href="http://localhost/frontend/web/index.php?r=cms%2Fupdate&id=<?= $model->id ?>" >update</a>
 
 </main>
 
